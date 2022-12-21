@@ -24,3 +24,27 @@ body {
   min-height: 100vh;
   justify-content: center;
 }
+
+button:disabled img.icon {
+  opacity: 0.3;
+}
+
+img.icon {
+  height: 20px;
+  width: 20px;
+}
+
+.link {
+  padding: 5px 10px;
+  padding-left: 20px;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 10px;
+  text-align: left;
+}
+
+.link * {
+  color: blue !important;
+}

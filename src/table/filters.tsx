@@ -1,3 +1,4 @@
+import { Button, Input, Select, Space } from "antd";
 import { useState } from "react";
 import { StringFilter, NumberFilter, DateFilter, EnumFilter } from "./types";
 
@@ -11,12 +12,14 @@ export function StringFilterForm({ value = { name: 'str', search: '', notInclude
       e.preventDefault();
       setValue({ name: 'str', search, notInclude })
     }}>
-      <label>Искать:<input value={search} onChange={(e) => setSearch(e.target.value)} /></label>
-      <br/>
-      <label>Исключить:<input value={notInclude} onChange={(e) => setNotInclude(e.target.value)} /></label>
-      <br />
-      <button type="submit">Применить</button>
-      <button type="button" onClick={onClear}>Очистить</button>
+      <Space direction="vertical" size="small">
+        <label>Искать:<Input value={search} onChange={(e) => setSearch(e.target.value)} /></label>
+        <label>Исключить:<Input value={notInclude} onChange={(e) => setNotInclude(e.target.value)} /></label>
+        <Space direction="horizontal">
+          <Button htmlType="submit">Применить</Button>
+          <Button htmlType="button" onClick={onClear}>Очистить</Button>
+        </Space>
+      </Space>
     </form>
   );
 }
@@ -29,12 +32,16 @@ export function NumberFilterForm({ value = { name: 'num', from: 0, to: 0 }, setV
       e.preventDefault();
       setValue({ name: 'num', to: +to, from: +from })
     }}>
-      <label>От:<input type="number" max={to} value={from} onChange={(e) => setFrom(e.target.value)} /></label>
-      <br />
-      <label>До:<input type="number" min={from} value={to} onChange={(e) => setTo(e.target.value)} /></label>
-      <br />
-      <button type="submit">Применить</button>
-      <button type="button" onClick={onClear}>Очистить</button>
+      <Space direction="vertical" size="small">
+        <label>От:<Input type="number" max={to} value={from} onChange={(e) => setFrom(e.target.value)} /></label>
+        <br />
+        <label>До:<Input type="number" min={from} value={to} onChange={(e) => setTo(e.target.value)} /></label>
+        <br />
+        <Space direction="horizontal">
+          <Button htmlType="submit">Применить</Button>
+          <Button htmlType="button" onClick={onClear}>Очистить</Button>
+        </Space>
+      </Space>
     </form>
   );
 }
@@ -47,12 +54,16 @@ export function DateFilterForm({ value = { name: 'date', from: new Date(), to: n
       e.preventDefault();
       setValue({ name: 'date', to: new Date(from), from: new Date(to) })
     }}>
-      <label>От:<input type="date" value={from} onChange={(e) => setFrom(e.target.value)} /></label>
-      <br />
-      <label>До:<input type="date" value={to} onChange={(e) => setTo(e.target.value)} /></label>
-      <br />
-      <button type="submit">Применить</button>
-      <button type="button" onClick={onClear}>Очистить</button>
+      <Space direction="vertical" size="small">
+        <label>От:<Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} /></label>
+        <br />
+        <label>До:<Input type="date" value={to} onChange={(e) => setTo(e.target.value)} /></label>
+        <br />
+        <Space direction="horizontal">
+          <Button htmlType="submit">Применить</Button>
+          <Button htmlType="button" onClick={onClear}>Очистить</Button>
+        </Space>
+      </Space>
     </form>
   );
 }
@@ -64,6 +75,7 @@ export function EnumFilterForm({ value = { name: 'enum', filter: [], values: ['i
       e.preventDefault();
       setValue({ ...value, filter })
     }}>
+      <Space direction="vertical" size="small">
       <label>
         Выберите допустимые значения:
         <br />
@@ -77,9 +89,11 @@ export function EnumFilterForm({ value = { name: 'enum', filter: [], values: ['i
           {value.values?.map((item) => <option key={item} value={item}>{item}</option>)}
         </select>
       </label>
-      <br />
-      <button type="submit">Применить</button>
-      <button type="button" onClick={onClear}>Очистить</button>
+      <Space direction="horizontal">
+        <Button htmlType="submit">Применить</Button>
+        <Button htmlType="button" onClick={onClear}>Очистить</Button>
+      </Space>
+      </Space>
     </form>
   );
 }

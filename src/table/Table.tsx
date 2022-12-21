@@ -1,7 +1,17 @@
 import { useCallback, useEffect, useState } from "react";
+import { Button, Checkbox, Input, Popconfirm, Radio, Space, Table as AntTable, Tooltip } from 'antd';
 import "./Table.scss"
 import { JustFilter, TableFilter, TableSort, TableType } from "./types";
-import ArrowPng from './arrow.png';
+import FilterAndSortPng from './filter_and_sort.png';
+import UpdatePng from './update.png';
+import SearchPng from './search.png';
+import LeftPng from './left.png';
+import RightPng from './right.png';
+import LoadingPng from './loading.gif';
+import StrPng from './text.png';
+import NumPng from './numbers.png';
+import DatePng from './clock.png';
+import EnumPng from './enum.jpg';
 import { DateFilterForm, EnumFilterForm, NumberFilterForm, StringFilterForm } from "./filters";
 
 export function Table<Data = any>({ columns, getData, ref }: TableType<Data>) {
@@ -69,6 +79,27 @@ export function Table<Data = any>({ columns, getData, ref }: TableType<Data>) {
     })
   }
 
+  const getSortRadio = (columnKey: string) => {
+    const sortParam = sort.find((item) => item.columnKey === columnKey);
+
+    if (sortParam) {
+      return sortParam.desc ? 'desc' : 'asc'
+    }
+
+    return 'not';
+  }
+
+  const setSortRadio = (columnKey: string, value: 'not' | 'desc' | 'asc') => {
+    setSort(
+      sort
+        .filter((item) => item.columnKey !== columnKey)
+        .concat(value !== 'not'
+          ? [{ columnKey, desc: value === 'desc' }]
+          : []
+        )
+    )
+  }
+
   return (
     <div className="table">
       <div className="table__header">
@@ -77,126 +108,108 @@ export function Table<Data = any>({ columns, getData, ref }: TableType<Data>) {
             e.preventDefault();
             setSearch((e.target as any).elements.search.value)
           }}>
-            <input name="search" placeholder="Поиск" />
-            <button type="submit">
-              Найти
-            </button>
+            <Space direction="horizontal">
+              <Input name="search" placeholder="Поиск" />
+              <Button htmlType="submit">
+                <img className="icon" src={SearchPng} alt="search" />
+              </Button>
+            </Space>
           </form>
-          <button onClick={renderData}>Обновить данные</button>
+          <Button onClick={renderData}>
+            <img className="icon" src={UpdatePng} alt="update" />
+          </Button>
         </div>
       </div>
       <div className="table__content">
-        <table>
-          <thead>
-            <tr>
-              {columns.map((column) => (
-                <th key={column.key}>
-                  {column.title}
+        {loading
+          ? (
+            <div style={{ width: '100%', display: 'flex', justifyContent: 'center', position: 'absolute', zIndex: +100 }}>
+              <img style={{ width: 500 }} src={LoadingPng} alt="loading" />
+            </div>
+          )
+          : (
+            <AntTable
+              columns={columns.map((column, id) => ({
+                dataIndex: 'column' + id,
+                title: (
                   <div
-                    className={
-                      "table__filter-sort" + ((
-                        sort.some((item) => item.columnKey === column.key)
-                        || filter.some((item) => item.columnKey === column.key)
-                      ) ? ' table__filter-sort-active' : '')
-                    }
+                    style={{ width: '100%', display: 'flex', justifyContent: 'space-between' }}
                   >
-                    <img src={ArrowPng} alt="arrow" />
-                    <div className="table__filter-sort-panel">
-                      <div className="table__prop">
-                        Сотрировка
-                        <div>
-                          <input
-                            name={'sort-' + column.key}
-                            type="radio"
-                            checked={sort.some(({ columnKey, desc }) => !desc && columnKey === column.key)}
-                            onClick={() => {
-                              setSort(
-                                sort
-                                  .filter(({ columnKey }) => columnKey !== column.key)
-                                  .concat([{ desc: false, columnKey: column.key }])
-                              );
-                            }}
-                          />
-                          От А до Я
-                        </div>
-                        <div>
-                          <input
-                            name={'sort-' + column.key}
-                            type="radio"
-                            checked={sort.some(({ columnKey, desc }) => desc && columnKey === column.key)}
-                            onClick={() => {
-                              setSort(
-                                sort
-                                  .filter(({ columnKey }) => columnKey !== column.key)
-                                  .concat([{ desc: true, columnKey: column.key }])
-                              );
-                            }}
-                          />
-                          От Я до А
-                        </div>
-                        <div>
-                          <input
-                            name={'sort-' + column.key}
-                            type="radio"
-                            checked={sort.every(({ columnKey }) => columnKey !== column.key)}
-                            onClick={() => {
-                              setSort(
-                                sort.filter(({ columnKey }) => columnKey !== column.key)
-                              );
-                            }}
-                          />
-                          Нет
-                        </div>
-                        Фильтр
-                        <br />
-                        <label>
-                          <input
-                            type="checkbox"
-                            checked={!excludeNull.includes(column.key)}
-                            onClick={() => {
-                              setExcludeNull(
-                                excludeNull.includes(column.key)
-                                  ? excludeNull.filter(item => item !== column.key)
-                                  : [...excludeNull, column.key]
-                              )
-                            }}
-                          />
-                          Показать пустые
-                        </label>
-                        {column.type === 'str' && (
-                          <StringFilterForm {...inputFiltersProps(column.key)} />
-                        )}
-                        {column.type === 'num' && (
-                          <NumberFilterForm {...inputFiltersProps(column.key)} />
-                        )}
-                        {column.type === 'date' && (
-                          <DateFilterForm {...inputFiltersProps(column.key)} />
-                        )}
-                        {column.type === 'enum' && (
-                          <EnumFilterForm {...inputFiltersProps(column.key)} />
-                        )}
-                      </div>
+                    <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-start', gap: 5 }}>
+                      {column.title}
+                      {column.type === 'str' && <img className="icon" src={StrPng} alt="" />}
+                      {column.type === 'num' && <img className="icon" src={NumPng} alt="" />}
+                      {column.type === 'date' && <img className="icon" src={DatePng} alt="" />}
+                      {column.type === 'enum' && <img className="icon" src={EnumPng} alt="" />}
                     </div>
+                    <Tooltip
+                      placement="bottomRight"
+                      color="white"
+                      title={(
+                        <div className="table__filter-sort-panel">
+                          <Space direction="vertical" size="small" className="table__prop">
+                            Сотрировка
+                            <Radio.Group
+                              value={getSortRadio(column.key)}
+                              onChange={(e) => setSortRadio(column.key, e.target.value)}
+                            >
+                              <Space style={{ width: '100%' }} direction="vertical" size="small">
+                                <Radio value="asc">от А до Я</Radio>
+                                <Radio value="desc">от Я до А</Radio>
+                                <Radio value="not">Нет</Radio>
+                              </Space>
+                            </Radio.Group>
+                            Фильтр
+                            <label>
+                              <Checkbox
+                                checked={!excludeNull.includes(column.key)}
+                                onClick={() => {
+                                  setExcludeNull(
+                                    excludeNull.includes(column.key)
+                                      ? excludeNull.filter(item => item !== column.key)
+                                      : [...excludeNull, column.key]
+                                  )
+                                }}
+                                style={{ marginRight: 5 }}
+                              />
+                              Показать пустые
+                            </label>
+                            {column.type === 'str' && (
+                              <StringFilterForm {...inputFiltersProps(column.key)} />
+                            )}
+                            {column.type === 'num' && (
+                              <NumberFilterForm {...inputFiltersProps(column.key)} />
+                            )}
+                            {column.type === 'date' && (
+                              <DateFilterForm {...inputFiltersProps(column.key)} />
+                            )}
+                            {column.type === 'enum' && (
+                              <EnumFilterForm {...inputFiltersProps(column.key)} />
+                            )}
+                          </Space>
+                        </div>
+                      )}
+                    >
+                      <img className="icon" src={FilterAndSortPng} alt="filterandsort" />
+                    </Tooltip>
                   </div>
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody style={{ opacity: loading ? 0.3 : 1 }}>
-            {data.map((item, index) => (
-              <tr key={index}>
-                {columns.map((column) => (
-                  <td>{column.render(item, index)}</td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                ),
+                key: 'column' + id,
+              }))}
+              pagination={false}
+              dataSource={[
+                ...data.map((item, itemId) => columns.reduce((acc, column, id) => ({
+                  ...acc,
+                  ['column' + id]: column.render(item, itemId)
+                }), {})),
+              ]}
+            />
+          )}
       </div>
       <div className="table__footer">
-        <div className="table__paginator">
+        <Space direction="horizontal">
           Показывать
-          <input
+          <Input
             type="number"
             min="0"
             max={totalRows}
@@ -204,39 +217,25 @@ export function Table<Data = any>({ columns, getData, ref }: TableType<Data>) {
             onChange={(e) => setLimit(e.target.value)}
           />
           Показаны
-          <button
-            disabled={offset === 0}
-            onClick={() => setOffset(0)}
-          >
-            {'<<'}
-          </button>
-          <button
+          <Button
             disabled={offset === 0}
             onClick={() => setOffset(Math.max(offset - +limit, 0))}
+            onDoubleClick={() => setOffset(0)}
           >
-            {'<'}
-          </button>
+            <img className="icon" src={LeftPng} alt="prev" />
+          </Button>
           {offset + 1} - {Math.min(offset + +limit, totalFiltredRows)}
-          <button
-            disabled={offset > totalFiltredRows - 1 - +limit}
+          <Button
+            disabled={offset === 0}
             onClick={() => setOffset(offset + +limit)}
+            onDoubleClick={() => setOffset(totalFiltredRows - +limit)}
           >
-            {'>'}
-          </button>
-          <button
-            disabled={offset > totalFiltredRows - 1 - +limit}
-            onClick={() => setOffset(totalFiltredRows - +limit)}
-          >
-            {'>>'}
-          </button>
-          Всего:
+            <img className="icon" src={RightPng} alt="next" />
+          </Button>
           <span>
-            с фильтами {totalFiltredRows}
+            Всего отфильтровано {totalFiltredRows} / {totalRows}
           </span>
-          <span>
-            исходно {totalRows}
-          </span>
-        </div>
+        </Space>
       </div>
     </div>
   )

@@ -1,21 +1,51 @@
 import { Route, Routes, Link } from 'react-router-dom';
 import { AdminTable } from './admin/AdminTable';
+import RoomsIcon from './assets/rooms.png';
+import UsersIcon from './assets/users.jpg';
+import MessagesIcon from './assets/messages.png';
+import OperatorIcon from './assets/operator.png';
+import { Login } from './login/Login';
 
 function App() {
   return (
-    <div style={{ width: '100vw', height: '100vh', display: 'grid', gridTemplateColumns: '200px 1fr', overflow: 'hidden' }}>
-      <ul>
-        <li><Link to="/rooms">Комнаты</Link></li>
-        <li><Link to="/peers">Участники</Link></li>
-        <li><Link to="/messages">Сообщения</Link></li>
-      </ul>
-      <div style={{ borderLeft: '1px solid grey', width: '100%', height: '100%' }}>
-        <Routes>
-          <Route path="/rooms" element={<AdminTable tableName="rooms" />} />
-          <Route path="/peers" element={<AdminTable tableName="peers" />} />
-          <Route path="/messages" element={<AdminTable tableName="messages" />} />
-        </Routes>
-      </div>
+    <div style={{ width: '100vw', height: '100vh', display: 'grid', gridTemplateColumns: '200px 1fr', gridTemplateRows: '100%', overflow: 'hidden' }}>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route
+          path="/*"
+          element={
+            <>
+              <div>
+                <div
+                  style={{
+                    display: 'flex',
+                    width: '200px',
+                    height: '200px',
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                  }}
+                >
+                  <img
+                    style={{ width: 150, height: 150 }}
+                    src={OperatorIcon}
+                  />
+                </div>
+                <div className="link"><img src={RoomsIcon} className="icon" alt=""/> <Link to="/rooms">Комнаты</Link></div>
+                <div className="link"><img src={UsersIcon} className="icon" alt=""/> <Link to="/peers">Участники</Link></div>
+                <div className="link"><img src={MessagesIcon} className="icon" alt=""/> <Link to="/messages">Сообщения</Link></div>
+              </div>
+              <div style={{ borderLeft: '1px solid grey', width: '100%', height: '100%' }}>
+                <Routes>
+                  <Route path="/login" element={<AdminTable tableName="rooms" />} />
+                  <Route path="/rooms" element={<AdminTable tableName="rooms" />} />
+                  <Route path="/peers" element={<AdminTable tableName="peers" />} />
+                  <Route path="/messages" element={<AdminTable tableName="messages" />} />
+                </Routes>
+              </div>
+            </>
+          }
+        />
+      </Routes>
     </div>
   )
 }
