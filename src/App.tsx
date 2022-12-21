@@ -1,7 +1,7 @@
 import { Route, Routes, Link } from 'react-router-dom';
 import { AdminTable } from './admin/AdminTable';
-import RoomsIcon from './assets/rooms.png';
-import UsersIcon from './assets/users.jpg';
+import RoomsIcon from './assets/rooms.jpg';
+import UsersIcon from './assets/users.png';
 import MessagesIcon from './assets/messages.png';
 import OperatorIcon from './assets/operator.png';
 import { Login } from './login/Login';

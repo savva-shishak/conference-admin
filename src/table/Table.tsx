@@ -11,7 +11,7 @@ import LoadingPng from './loading.gif';
 import StrPng from './text.png';
 import NumPng from './numbers.png';
 import DatePng from './clock.png';
-import EnumPng from './enum.jpg';
+import AnchorPng from './link.jpg';
 import { DateFilterForm, EnumFilterForm, NumberFilterForm, StringFilterForm } from "./filters";
 
 export function Table<Data = any>({ columns, getData, ref }: TableType<Data>) {
@@ -135,12 +135,12 @@ export function Table<Data = any>({ columns, getData, ref }: TableType<Data>) {
                   <div
                     style={{ width: '100%', display: 'flex', justifyContent: 'space-between' }}
                   >
-                    <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-start', gap: 5 }}>
+                    <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-start', alignItems: 'center', gap: 5 }}>
                       {column.title}
                       {column.type === 'str' && <img className="icon" src={StrPng} alt="" />}
                       {column.type === 'num' && <img className="icon" src={NumPng} alt="" />}
                       {column.type === 'date' && <img className="icon" src={DatePng} alt="" />}
-                      {column.type === 'enum' && <img className="icon" src={EnumPng} alt="" />}
+                      {(column.type as string) === 'anchor' && <img className="icon" src={AnchorPng} alt="" />}
                     </div>
                     <Tooltip
                       placement="bottomRight"
