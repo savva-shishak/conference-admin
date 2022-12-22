@@ -12,6 +12,8 @@ import StrPng from './text.png';
 import NumPng from './numbers.png';
 import DatePng from './clock.png';
 import AnchorPng from './link.jpg';
+import KeyPng from './key.png';
+import ImagePng from './image.png';
 import { DateFilterForm, EnumFilterForm, NumberFilterForm, StringFilterForm } from "./filters";
 
 export function Table<Data = any>({ columns, getData, ref }: TableType<Data>) {
@@ -140,6 +142,8 @@ export function Table<Data = any>({ columns, getData, ref }: TableType<Data>) {
                       {column.type === 'str' && <img className="icon" src={StrPng} alt="" />}
                       {column.type === 'num' && <img className="icon" src={NumPng} alt="" />}
                       {column.type === 'date' && <img className="icon" src={DatePng} alt="" />}
+                      {column.type === 'key' && <img className="icon" src={KeyPng} alt="" />}
+                      {column.type === 'img' && <img className="icon" src={ImagePng} alt="" />}
                       {(column.type as string) === 'anchor' && <img className="icon" src={AnchorPng} alt="" />}
                     </div>
                     <Tooltip
@@ -174,7 +178,7 @@ export function Table<Data = any>({ columns, getData, ref }: TableType<Data>) {
                               />
                               Показать пустые
                             </label>
-                            {column.type === 'str' && (
+                            {['str', 'password'].includes(column.type) && (
                               <StringFilterForm {...inputFiltersProps(column.key)} />
                             )}
                             {column.type === 'num' && (
@@ -190,7 +194,13 @@ export function Table<Data = any>({ columns, getData, ref }: TableType<Data>) {
                         </div>
                       )}
                     >
-                      <img className="icon" src={FilterAndSortPng} alt="filterandsort" />
+                      <Button
+                        size="small"
+                        danger={sort.concat(filter as any).some(item => item.columnKey === column.key)}
+                        
+                      >
+                        <img className="icon" src={FilterAndSortPng} alt="filterandsort" />
+                      </Button>
                     </Tooltip>
                   </div>
                 ),

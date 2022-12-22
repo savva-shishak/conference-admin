@@ -5,8 +5,8 @@ import { StringFilter, NumberFilter, DateFilter, EnumFilter } from "./types";
 export type StateValue<Data> = { value?: Data, setValue: (v: Data) => any, onClear: () => void }
 
 export function StringFilterForm({ value = { name: 'str', search: '', notInclude: '' }, setValue, onClear }: StateValue<StringFilter>) {
-  const [notInclude, setNotInclude] = useState<string>(value.search);
-  const [search, setSearch] = useState<string>(value.notInclude);
+  const [notInclude, setNotInclude] = useState<string>(value.notInclude);
+  const [search, setSearch] = useState<string>(value.search);
   return (
     <form onSubmit={(e) => {
       e.preventDefault();

@@ -1,7 +1,10 @@
+import { Button } from 'antd';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Table } from '../table/Table';
+import CopyIcon from './copy.png';
+import DownloadIcon from './download.png';
 import { agent } from './context';
 
 export function AdminTable({ tableName }: { tableName: string }) {
@@ -14,11 +17,15 @@ export function AdminTable({ tableName }: { tableName: string }) {
       setColumns(data.map((column: any) => ({
         ...column,
         render(row: any) {
-          if (column.type === 'date' && !!row[column.key]) {
+          if (!row[column.key]) {
+            return null;
+          }
+
+          if (column.type === 'date') {
             return moment(row[column.key]).format(column.format)
           }
 
-          if (column.type === 'anchor' && !!row[column.key]) {
+          if (column.type === 'anchor') {
             const { href, label } = row[column.key];
 
             if (href.startsWith('http')) {
@@ -36,6 +43,31 @@ export function AdminTable({ tableName }: { tableName: string }) {
                 </a>
               );
             }
+          }
+
+          if (column.type === 'img') {
+            return (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <img src={row[column.key]} alt={column.key} style={{ height: 50, width: 'auto' }} />
+                <a href={row[column.key]} target="_blank">
+                  <Button size="small">
+                    <img src={DownloadIcon} className="icon" />
+                  </Button>
+                </a>
+              </div>
+            )
+          }
+
+          if (column.type === 'key') {
+            return (
+              <div>
+                <Button style={{ marginRight: 10 }} size="small" onClick={() => navigator.clipboard.writeText(row[column.key])}>
+                  <img src={CopyIcon} className="icon" />
+                </Button>
+                {row[column.key].slice(0, 5)}
+                ...
+              </div>
+            )
           }
 
           return row[column.key];
