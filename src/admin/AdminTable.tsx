@@ -1,23 +1,40 @@
-import { Button } from 'antd';
+import { useEffect, useRef } from 'react';
+import { Button } from 'react-bootstrap';
 import moment from 'moment';
-import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Table } from '../table/Table';
 import CopyIcon from './copy.png';
 import DownloadIcon from './download.png';
 import { agent } from './context';
+import { Column } from './types';
+import { onUpdate } from '../App';
+import { AdminCheckbox } from './AdminCheckbox';
+import { AdminSelect } from './AdminSelect';
+import { AdminMultiSelect } from './Admin.MultiSelect';
+import { AdminInput } from './AdminInput';
 
-export function AdminTable({ tableName }: { tableName: string }) {
-  const [columns, setColumns] = useState(null);
+export function AdminTable({ id, columns }: { id: string, columns: Column<any>[] }) {
   const navigate = useNavigate();
+  const ref = useRef(() => {})
 
   useEffect(() => {
-    setColumns(null);
-    agent.get(`/table/${tableName}/columns`).then(({ data }) => {
-      setColumns(data.map((column: any) => ({
-        ...column,
+    const sub = onUpdate.subscribe(() => {
+      ref.current();
+    });
+
+    return () => sub.unsubscribe();
+  }, []);
+
+  return (columns ? (
+    <Table
+      itemRef={ref}
+      columns={columns.map((column: any) => ({
+        key: column.key as any,
+        title: column.title,
+        type: ['anchor', 'password'].includes(column.type) ? 'str' : column.type as any,
+        values: column.values,
         render(row: any) {
-          if (!row[column.key]) {
+          if (row[column.key] === null || row[column.key] === undefined) {
             return null;
           }
 
@@ -50,7 +67,7 @@ export function AdminTable({ tableName }: { tableName: string }) {
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <img src={row[column.key]} alt={column.key} style={{ height: 50, width: 'auto' }} />
                 <a href={row[column.key]} target="_blank">
-                  <Button size="small">
+                  <Button variant="light" size="sm">
                     <img src={DownloadIcon} className="icon" />
                   </Button>
                 </a>
@@ -61,7 +78,7 @@ export function AdminTable({ tableName }: { tableName: string }) {
           if (column.type === 'key') {
             return (
               <div>
-                <Button style={{ marginRight: 10 }} size="small" onClick={() => navigator.clipboard.writeText(row[column.key])}>
+                <Button variant="light" style={{ marginRight: 10 }} size="sm" onClick={() => navigator.clipboard.writeText(row[column.key])}>
                   <img src={CopyIcon} className="icon" />
                 </Button>
                 {row[column.key].slice(0, 5)}
@@ -70,17 +87,39 @@ export function AdminTable({ tableName }: { tableName: string }) {
             )
           }
 
+          if (column.type === 'checkbox') {
+            return (
+              <AdminCheckbox value={row[column.key]} row={row} actionId={column.onChange} />
+            );
+          }
+
+          if (column.type === 'select') {
+            return (
+              <AdminSelect options={column.options} value={row[column.key]} row={row} actionId={column.onChange} />
+            );
+          }
+
+          if (column.type === 'multiselect') {
+            return (
+              <AdminMultiSelect options={column.options} value={row[column.key]} row={row} actionId={column.onChange} />
+            );
+          }
+
+          if (column.type === 'input') {
+            return (
+              <AdminInput value={row[column.key]} row={row} actionId={column.onChange} />
+            );
+          }
+
+          if (column.type === 'html') {
+            return <div dangerouslySetInnerHTML={{ __html: row[column.key] }} />;
+          }
+
           return row[column.key];
         }
-      })))
-    });
-  }, [tableName]);
-
-  return (columns ? (
-    <Table
-      columns={columns}
+      }))}
       getData={(params) => {
-        return agent.post(`/table/${tableName}/get-data`, { params }).then(res => res.data);
+        return agent.post(`/admin/pages/components/get-data`, { params, id }).then(res => res.data);
       }} 
     />
   ) : <>Загрузка...</>)

@@ -17,12 +17,14 @@
   box-sizing: border-box;
 }
 
+
 body {
   margin: 0;
   display: flex;
   place-items: center;
   min-height: 100vh;
   justify-content: center;
+  overflow: hidden;
 }
 
 button:disabled img.icon {

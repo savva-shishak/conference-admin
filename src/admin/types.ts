@@ -1,9 +1,7 @@
-import { MutableRefObject, ReactNode } from "react"
-
 export type NumberFilter = {
   name: 'num',
-  from: number | null,
-  to: number | null,
+  from: number,
+  to: number,
 }
 
 export type StringFilter = {
@@ -25,29 +23,32 @@ export type EnumFilter = {
 }
 
 export type NullFilter = {
-  name: 'not-null',
+  name: 'not-null';
 }
 
 export type JustFilter = EnumFilter | DateFilter | NumberFilter | StringFilter | NullFilter;
 
-
 export type Column<Data> = {
-  key: string,
+  key: keyof Data,
+  title: string,
+  type: 'num' | 'str' | 'anchor' | 'key' | 'img',
   width?: number,
-  title: ReactNode,
-  type: 'num' | 'date' | 'str' | 'img' | 'key',
-  render: (data: Data, index: number) => ReactNode,
 } | {
-  key: string,
-  width?: number,
-  title: ReactNode,
+  key: keyof Data,
+  title: string,
   type: 'enum',
   values: string[],
-  render: (data: Data, index: number) => ReactNode,
-}
+  width?: number,
+} | {
+  key: keyof Data,
+  title: string,
+  type: 'date',
+  format: string,
+  width?: number,
+};
 
 export type TableSort = { desc: boolean, columnKey: string }
-export type TableFilter =  { filter: JustFilter, columnKey: string };
+export type TableFilter = { filter: JustFilter, columnKey: string };
 
 export type GetDataParams = {
   sort: TableSort[],
@@ -59,7 +60,6 @@ export type GetDataParams = {
 
 export type TableType<Data> = {
   columns: Column<Data>[];
-  itemRef?: MutableRefObject<(() => any) | undefined>;
   getData: (params: GetDataParams) => Promise<{
     data: Data[];
     totalRows: number;
